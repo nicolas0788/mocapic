@@ -1,0 +1,65 @@
+version: "3.9"
+
+services:
+  # ----------------------------
+  # PHP + Apache (backend MVC)
+  # ----------------------------
+  app:
+    build: .
+    container_name: mocapic_app
+    ports:
+      - "8080:80"
+    volumes:
+      - ./app:/var/www/html/app
+    env_file:
+      - .env
+    depends_on:
+      - db
+    restart: unless-stopped
+
+  # ----------------------------
+  # MariaDB (base de datos)
+  # ----------------------------
+  db:
+    image: mariadb:10.6
+    container_name: mocapic_db
+    restart: unless-stopped
+    ports:
+      - "3307:3306"
+    env_file:
+      - .env
+    volumes:
+      - dbdata:/var/lib/mysql
+
+  # ----------------------------
+  # phpMyAdmin (gestión DB)
+  # ----------------------------
+  phpmyadmin:
+    image: phpmyadmin:5
+    container_name: mocapic_pma
+    restart: unless-stopped
+    ports:
+      - "8081:80"
+    environment:
+      - PMA_HOST=db
+      - PMA_USER=${MYSQL_USER}
+      - PMA_PASSWORD=${MYSQL_PASSWORD}
+    depends_on:
+      - db
+
+  # ----------------------------
+  # Astro (frontend estático)
+  # ----------------------------
+  frontend:
+    image: node:20
+    container_name: mocapic_frontend
+    working_dir: /usr/src/app
+    volumes:
+      - ./astro-frontend:/usr/src/app
+      - ./app/public_html/assets:/usr/src/output
+    command: sh -c "npm install && npm run build && cp -r dist/* /usr/src/output/"
+    depends_on:
+      - app
+
+volumes:
+  dbdata:

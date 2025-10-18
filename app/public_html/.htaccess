@@ -1,0 +1,112 @@
+# =============================================================================
+# .htaccess — Configuración de Apache para proyecto MOCAPIC (PHP MVC + Astro)
+# =============================================================================
+# Este archivo controla:
+#   - URLs limpias (sin .php en las rutas)
+#   - Redirección de todas las solicitudes a index.php (Front Controller MVC)
+#   - Protección de archivos sensibles (.env, .sql, etc.)
+#   - Activación de cabeceras básicas de seguridad
+#
+# 💡 Funciona igual en Docker y en Hostinger
+#  ******************* LEER ULTIMA LINEA PARA PRODUCION!!!!
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# SEGURIDAD: Bloquear listados de directorios
+# -----------------------------------------------------------------------------
+# Evita que se muestren los contenidos de carpetas sin index.php / index.html
+# Ejemplo: /uploads/ devolverá 403 Forbidden en lugar de listar archivos.
+# No afecta el acceso a los recursos generados por Astro (CSS, JS, imágenes).
+# -----------------------------------------------------------------------------
+Options -Indexes
+
+# -----------------------------------------------------------------------------
+# 1️⃣ Activar el motor de reescritura de URLs
+# -----------------------------------------------------------------------------
+RewriteEngine On
+
+# Si estás en un subdirectorio del hosting (por ejemplo /mocapic/),
+# podés ajustar RewriteBase:
+# RewriteBase /mocapic/
+RewriteBase /
+
+
+# -----------------------------------------------------------------------------
+# 2️⃣ No reescribir solicitudes que apunten a archivos o carpetas existentes
+# -----------------------------------------------------------------------------
+# Esto evita que Apache redirija imágenes, CSS, JS o recursos del build de Astro.
+# Ejemplo: /assets/main.js o /uploads/foto.jpg se sirven directamente.
+# -----------------------------------------------------------------------------
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+
+# -----------------------------------------------------------------------------
+# 3️⃣ Redirigir todo lo demás al Front Controller de PHP (index.php)
+# -----------------------------------------------------------------------------
+# Si la ruta no existe como archivo o carpeta, la enviamos al router PHP.
+# Ejemplo: /galeria → index.php (Router.php resuelve controlador y método)
+# -----------------------------------------------------------------------------
+RewriteRule ^ index.php [L]
+
+
+# -----------------------------------------------------------------------------
+# 4️⃣ PROTECCIÓN DE ARCHIVOS SENSIBLES
+# -----------------------------------------------------------------------------
+# Bloquea acceso a archivos de configuración, bases de datos y backups.
+# Esto impide que se descargue tu .env o cualquier archivo interno.
+# -----------------------------------------------------------------------------
+<FilesMatch "\.(env|ini|log|sql|bak|sh|yml|yaml)$">
+  Require all denied
+</FilesMatch>
+
+
+# -----------------------------------------------------------------------------
+# 5️⃣ CABECERAS DE SEGURIDAD BÁSICAS
+# -----------------------------------------------------------------------------
+# Añade protecciones HTTP estándar para evitar vulnerabilidades comunes.
+# -----------------------------------------------------------------------------
+# Evita que el navegador interprete tipos MIME incorrectos
+Header always set X-Content-Type-Options "nosniff"
+
+# Impide que tu sitio se embeba dentro de otros (clickjacking)
+Header always set X-Frame-Options "SAMEORIGIN"
+
+# Controla la política de referencia (protege URLs internas)
+Header always set Referrer-Policy "strict-origin-when-cross-origin"
+
+# Refuerza la seguridad de transporte (en hosting con HTTPS)
+#Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+
+
+# -----------------------------------------------------------------------------
+# 6️⃣ COMPRESIÓN Y CACHE (opcional, mejora rendimiento)
+# -----------------------------------------------------------------------------
+# Estas directivas ayudan a que los assets de Astro se sirvan más rápido.
+# -----------------------------------------------------------------------------
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css text/javascript application/javascript application/json
+</IfModule>
+
+<IfModule mod_expires.c>
+  ExpiresActive On
+  # Astro: HTML, CSS, JS, imágenes
+  ExpiresByType text/html "access plus 1 day"
+  ExpiresByType text/css "access plus 7 days"
+  ExpiresByType application/javascript "access plus 7 days"
+  ExpiresByType image/webp "access plus 30 days"
+  ExpiresByType image/jpeg "access plus 30 days"
+  ExpiresByType image/png "access plus 30 days"
+  ExpiresByType image/svg+xml "access plus 30 days"
+</IfModule>
+
+
+# -----------------------------------------------------------------------------
+# 7️⃣ OPCIONAL: REDIRECCIÓN AUTOMÁTICA A HTTPS (solo producción)
+# -----------------------------------------------------------------------------
+# Cuando subas el proyecto a Hostinger, descomentá estas líneas
+# si tu dominio tiene certificado SSL.
+# -----------------------------------------------------------------------------
+# RewriteCond %{HTTPS} off
+# RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+# =============================================================================

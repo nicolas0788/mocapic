@@ -1,0 +1,147 @@
+# =============================================================================
+# .gitignore — ARCHIVOS Y CARPETAS QUE NO SE SUBEN AL REPOSITORIO (MOCAPIC)
+# =============================================================================
+# 💡 Objetivos:
+#   - Proteger credenciales (.env)
+#   - Evitar archivos pesados o generados automáticamente
+#   - Mantener el repositorio limpio, seguro y reproducible
+# =============================================================================
+
+
+# ----------------------------------------------------------------------------- #
+# 🔐 1️⃣ ARCHIVOS DE CONFIGURACIÓN PRIVADA
+# ----------------------------------------------------------------------------- #
+
+.env
+.env.local
+.env.*.local
+.env.backup
+# 🔹 No deben subirse nunca. Contienen credenciales o datos sensibles.
+# 🔹 Subí en su lugar `.env.example` con las mismas claves vacías.
+
+
+# ----------------------------------------------------------------------------- #
+# 🗃️ 2️⃣ DEPENDENCIAS / LIBRERÍAS EXTERNAS
+# ----------------------------------------------------------------------------- #
+
+/vendor/
+/node_modules/
+/package-lock.json
+/yarn.lock
+# 🔹 Se regeneran con `composer install` o `npm install`.
+
+# Mantener lockfile de PNPM para asegurar mismas versiones en ambas PCs
+!pnpm-lock.yaml
+
+
+# ----------------------------------------------------------------------------- #
+# 🧱 3️⃣ ARCHIVOS TEMPORALES DEL SISTEMA Y EDITORES
+# ----------------------------------------------------------------------------- #
+
+*.log
+*.tmp
+*.bak
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+# 🔹 Archivos temporales o creados por editores / SO.
+
+
+# ----------------------------------------------------------------------------- #
+# 💾 4️⃣ DUMPS, EXPORTACIONES Y BACKUPS
+# ----------------------------------------------------------------------------- #
+
+app/dumps/*
+!app/dumps/.gitkeep
+backups/*
+export/*
+*.sql
+*.zip
+!*/.gitkeep
+# 🔹 Evita subir dumps o backups grandes. 
+# 🔹 Conservá `.gitkeep` para mantener carpetas vacías.
+
+
+# ----------------------------------------------------------------------------- #
+# 🐳 5️⃣ ARCHIVOS GENERADOS POR DOCKER
+# ----------------------------------------------------------------------------- #
+
+/dbdata/
+/data/
+/mysql/
+/docker-data/
+/storage/mysql/
+/storage/redis/
+/storage/postgres/
+# 🔹 Volúmenes o datos binarios de contenedores Docker (no se suben).
+
+
+# ----------------------------------------------------------------------------- #
+# 📂 6️⃣ SUBIDAS / IMÁGENES / ARCHIVOS DINÁMICOS
+# ----------------------------------------------------------------------------- #
+
+/uploads/
+/storage/images/
+/storage/thumbs/
+/storage/originals/
+/storage/cache/
+# 🔹 Archivos subidos o generados por usuarios.
+# 🔹 No deben formar parte del repo.
+
+
+# ----------------------------------------------------------------------------- #
+# 📦 7️⃣ COMPILACIÓN (FRONTEND - ASTRO)
+# ----------------------------------------------------------------------------- #
+
+# Ignorar carpetas generadas tanto en raíz como dentro del frontend
+dist/
+build/
+.cache/
+.astro/
+coverage/
+
+astro-frontend/dist/
+astro-frontend/build/
+astro-frontend/.astro/
+astro-frontend/.cache/
+astro-frontend/coverage/
+astro-frontend/node_modules/
+astro-frontend/.vercel/
+astro-frontend/.netlify/
+# 🔹 Ignora compilaciones, dependencias y carpetas de deploy.
+# 🔹 Conserva `astro-frontend/src`, `astro-frontend/package.json`, etc.
+
+
+# ----------------------------------------------------------------------------- #
+# 🧪 8️⃣ CONFIGURACIÓN LOCAL DE EDITORES
+# ----------------------------------------------------------------------------- #
+
+.vscode/
+.idea/
+*.code-workspace
+# 🔹 Configuraciones personales del entorno de desarrollo.
+
+
+# ----------------------------------------------------------------------------- #
+# 🧰 9️⃣ ARCHIVOS TEMPORALES Y OTROS
+# ----------------------------------------------------------------------------- #
+
+/tmp/
+/test/
+/__pycache__/
+/node-debug.log
+npm-debug.log*
+app.zip
+# 🔹 Evita subir archivos comprimidos, temporales o de prueba.
+
+
+# =============================================================================
+# ✅ RESUMEN FINAL
+# -----------------------------------------------------------------------------
+# Este .gitignore garantiza que:
+#   - Solo se suba el código fuente útil (app/, astro-frontend/src, configs)
+#   - Las credenciales (.env) y archivos de entorno queden fuera
+#   - Los builds y dependencias no inflen el repositorio
+#   - Se mantengan entornos idénticos en ambas PCs (pnpm-lock incluido)
+# =============================================================================
